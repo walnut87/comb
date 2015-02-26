@@ -1,0 +1,279 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Feb 17 17:25:02 2015
+
+@author: kusumast@usc.edu
+"""
+
+from tabulate import tabulate
+from random import shuffle
+import random
+
+strategy=[1,1,1,2,2,2,2,3,3,3]
+
+def shuffler (list):
+    shuffle(list)
+    return list
+
+d_seq = shuffler(strategy)
+u_seq = shuffler(strategy)
+
+def attackersim(a_action, d_action, u_action, a_res, d_res, u_res, cap):  
+    # initializing successes
+    ad_success = None
+    au_success = None
+    #aud_success = None
+    #attacker action
+    a_cost = 0.5
+    if a_action == 1:
+        ac_mes='you chose obtain capability'
+        #a_cost = 0.5
+        a_payoff = 0
+        pcap = 0.5
+        rand = random.random()
+        if rand <= pcap:
+            cap = 1
+            a_message = "capability obtained"
+        else:
+            cap = 0
+            a_message = "failed to obtain capability"
+        # attacking defender
+    elif a_action == 2:
+        ac_mes='you chose attack the defender'
+        # getting success probability
+        if cap == 1:
+            # a_cost = 0.5
+            if d_action == 1:
+                psuccess_ad = 0.7
+            elif d_action == 2:
+                psuccess_ad = 0.5
+            elif d_action == 3:
+                psuccess_ad = 0.3
+        elif cap == 0:
+           # a_cost = 0.5
+            if d_action == 1:
+                psuccess_ad = 0.04
+            elif d_action == 2:
+                psuccess_ad = 0.02
+            elif d_action == 3:
+                psuccess_ad = 0.005
+            # determining success
+        rand = random.random()
+        if rand <= psuccess_ad:
+            ad_success = True
+            a_message = "attack defender success"
+            if d_action == 1:
+                a_payoff = 2
+            elif d_action == 2:
+                a_payoff = 4
+            elif d_action == 3:
+                a_payoff = 6
+        else:
+            ad_success = False
+            a_message = "attack defender fail"
+            if a_action == 1:
+                a_payoff = -1
+            elif a_action == 2:
+                a_payoff = -2
+            elif a_action == 3:
+                a_payoff = -3
+                # attacking user
+    elif a_action == 3:
+        ac_mes='you chose attack the user'
+        #a_cost=0.5
+        if u_action == 1:
+            if d_action == 1:
+                psuccess_au = 0.9
+            elif d_action == 2:
+                psuccess_au = 0.8
+            elif d_action == 3:
+                psuccess_au = 0.7
+        elif u_action == 2:
+            if d_action == 1:
+                psuccess_au = 0.6
+            elif d_action == 2:
+                psuccess_au = 0.5
+            elif d_action == 3:
+                psuccess_au = 0.4
+        elif u_action == 3:
+            if d_action == 1:
+                psuccess_au = 0.3
+            elif d_action == 2:
+                psuccess_au = 0.2
+            elif d_action == 3:
+                psuccess_au = 0.1
+        rand = random.random()
+        if rand <= psuccess_au:
+            au_success = True
+            a_message = "attack user success"
+            if d_action == 1:
+                a_payoff = 1
+            elif d_action == 2:
+                a_payoff = 1
+            elif d_action == 3:
+                a_payoff = 1
+        else:
+            au_success = False
+            a_message = "attack user fail"
+            if a_action == 1:
+                a_payoff = 0
+            elif a_action == 2:
+                a_payoff = 0
+            elif a_action == 3:
+                a_payoff = 0
+    a_res = a_res - a_cost + a_payoff
+    print('------------------')    
+    print('attacker: ')
+    print(ac_mes)    
+    print(a_message)
+    print('you have ', a_res)
+    #defender
+    if d_action == 1:
+        d_cost = 0.25
+        dc_mes="defender chose low security"
+    elif d_action == 2:
+        d_cost = 0.5
+        dc_mes="defender chose medium security"
+    elif d_action == 3:
+        d_cost = 2
+        dc_mes="defender chose high security"
+    if a_action == 1:
+        d_message = "no attack detected"
+        d_payoff = 0
+    elif a_action == 2:
+        cap = 0
+        if ad_success == True:
+            d_message = "system attacked"
+            if d_action == 1:
+                d_payoff = -1
+            elif d_action == 2:
+                d_payoff = -1
+            elif d_action == 3:
+                d_payoff = -1
+        elif ad_success == False:
+            d_message = "system attacked but defended"
+            if d_action == 1:
+                d_payoff = 2
+            elif d_action == 2:
+                d_payoff = 2
+            elif d_action == 3:
+                d_payoff = 2
+    elif a_action == 3:
+        if au_success == True:
+            d_message="user attacked"
+            d_payoff=-1            
+            """if d_action == 1:
+                psuccess_aud=0.3
+            elif d_action == 2:
+                psuccess_aud=0.2
+            elif d_action == 3:
+                psuccess_
+                aud=0.1
+            
+            rand = random.random()
+            if rand <= psuccess_aud:
+                d_message = "user attacked and infiltrated system"
+                aud_success = True
+                if d_action == 1:
+                    d_payoff = -0.5
+                elif d_action == 2:
+                    d_payoff = -0.5
+                elif d_action == 3:
+                    d_payoff = -0.5
+            else:
+                d_message = "user attacked but system successfully defended"
+                aud_success = False
+                if d_action == 1:
+                    d_payoff = 1
+                elif d_action == 2:
+                    d_payoff = 1
+                elif d_action == 3:
+                    d_payoff = 1
+                    """
+        elif au_success == False:
+            d_message = "user attacked but defended"
+            d_payoff=0
+            """if d_action == 1:
+                d_payoff = 1
+            elif d_action == 2:
+                d_payoff = 1
+            elif d_action == 3:
+                d_payoff = 1 """
+    d_res = d_res - d_cost + d_payoff
+    print('------------------')    
+    print('defender: ')
+    print(dc_mes)
+    print(d_message)
+    print('the defender has ', d_res)
+    #user
+    if u_action == 1:
+        uc_mes = 'user chose low security'
+        u_cost = 0
+    elif u_action == 2:
+        uc_mes = 'user chose medium security'
+        u_cost = 0.5
+    elif u_action == 3:
+        u_cost = 0.75
+        uc_mes = 'user chose high security'
+    if a_action == 1:
+        u_message="no attack detected"
+        u_payoff=0
+    elif a_action == 2:
+        u_payoff=0
+        if ad_success == True:
+            u_message="system attacked"
+        else:
+            u_message="system defended attack"
+    elif a_action == 3:
+        if au_success == True:
+            u_message="attack detected fail to defend"
+            if u_action == 1:
+                u_payoff = 1
+            elif u_action == 2:
+                u_payoff = 1
+            elif u_action == 3:
+                u_payoff = 1
+        elif au_success == False:
+            u_message="attack detected defended"
+            if u_action == 1:
+                u_payoff = -0.5
+            elif u_action == 2:
+                u_payoff = -0.5
+            elif u_action == 3:
+                u_payoff = -0.5
+    u_res = u_res - u_cost + u_payoff
+    print('------------------')    
+    print('user: ')
+    print(uc_mes)
+    print(u_message)
+    print('the user has ', u_res)
+    print('------------------') 
+    result=[n,a_action,d_action,u_action,cap,ad_success,au_success,a_res,d_res,u_res]
+    return result
+    
+round = (1,2,3,4,5,6,7,8,9,10)
+Title=['Round','A Decision','D Decision','U Decision','Capability','Success AD','Success AU', 'A Resource','D Resource','U Resource']
+matrix=[Title]
+a_res=5
+d_res=5
+u_res=5
+cap=0
+
+
+for n in round:
+    d_action=d_seq[n-1]
+    u_action=u_seq[n-1]
+    print('You are the attacker and have three choices of action')
+    print('1. Obtain capability')
+    print('2. Attack defender')
+    print('3. Attack user')
+    a_decision = int(input('type the number of your decision '))
+    result = attackersim(a_decision,d_action,u_action,a_res,d_res,u_res,cap)
+    cap = result[4]    
+    a_res = result[7]
+    d_res = result[8]
+    u_res = result[9]    
+    matrix.append(result)
+
+    
+print(tabulate(matrix))
